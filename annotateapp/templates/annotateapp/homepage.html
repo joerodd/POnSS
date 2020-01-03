@@ -1,0 +1,92 @@
+<html>
+<head>
+<title>Joe's annotation task (Summer 2018)</title>
+<link href='https://fonts.googleapis.com/css?family=Cabin+Sketch:700,400' rel='stylesheet' type='text/css'>
+<style type="text/css">
+	body{
+    padding: 10px;
+    margin: 10px;
+    font-family: 'Cabin Sketch', cursive;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#messagetitle{
+  text-align:center;
+  color: blue;
+  font-size: 1.2em;
+}
+table{
+	text-align: center;
+}
+a{
+  text-align:center;
+  color: red;
+  font-size: 1em;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+<div id = "messagetitle">Orthographic transcription</div>
+
+<br>
+<center>There are {{ still_to_ortho}} orthographic transcription trials to go.</center>
+<br>
+{#<a href="/annotate/retrim_practice/" target="_blank">Training + practice round</a>#}
+<a href="/static/cheatsheet_ortho.html">Cheatsheet</a>
+<a href="/annotate/ortho/" target="_blank">Real deal</a>
+
+<br><br>
+
+<div id = "messagetitle">Triage</div>
+
+<br>
+<center>There are {{ still_to_evaluate }} triage trials to go.</center>
+<br>
+<a href="/annotate/evaluate_practice/" target="_blank">Training + practice round</a>
+<a href="/static/cheatsheet.html">Cheatsheet</a>
+<a href="/annotate/preload_evaluate/" target="_blank">Real deal</a>
+<br><br>
+<div id = "messagetitle">Retrimming</div>
+
+<br>
+<center>There are {{ still_to_retrim }} retrimming trials to go.</center>
+<br>
+<a href="/annotate/retrim_practice/" target="_blank">Training + practice round</a>
+<a href="/static/cheatsheet_retrim.html">Cheatsheet</a>
+<a href="/annotate/preload_retrim/" target="_blank">Real deal</a>
+
+<br><br>
+<div id = "messagetitle">Administration</div>
+
+<br>
+{% if request.user.is_staff %}
+<a href="/admin/" target="_blank">Admin interface</a>
+<a href="/annotate/upload_trials/" target="_blank">Upload more trials</a>
+    <a href="/annotate/process_network_trials/" target="_blank">Retrieve more trials from a location on the MPI network</a>
+<a href="/annotate/calculate_current_and_rating/" target="_blank">Update lists</a>
+    <br>
+{% endif %}
+
+
+{#<div id = "messagetitle">Joe's error counting task (Autumn 2018)</div>#}
+{##}
+{#<br><br>#}
+{#<center>There are still {{ still_to_error}} error counting trials to go.</center>#}
+{#<br><br>#}
+{#<a href="/static/cheatsheet_errors.html">Cheatsheet</a>#}
+{#<a href="/annotate/errors/" target="_blank">Real deal</a>#}
+
+
+<a href="/accounts/logout/">Log out</a>
+<br><br>
+Often it will take up to a minute to load the first sound. Please be patient! After the first sound is loaded it will nearly always be very quick. Your results are saved continuously, so when you get fed up, you can just close the browser window. <b> Internet Explorer doesn't work, use Chrome or Firefox.</b>
+</body>
+</html>

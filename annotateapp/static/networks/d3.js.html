@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<style>
+
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+  opacity: .6;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .9;
+}
+
+</style>
+
+<style>
+.axis {
+  font: 10px sans-serif;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+.axis .domain {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .3;
+  stroke-width: 10px;
+  stroke-linecap: round;
+}
+
+.axis .halo {
+  fill: none;
+  stroke: #ddd;
+  stroke-width: 8px;
+  stroke-linecap: round;
+}
+
+.slider .handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: .5;
+  stroke-width: 1.25px;
+  cursor: crosshair;
+}
+
+.c3-region.regionX {
+    -moz-transition: none;
+    -webkit-transition: none;
+    -o-transition: color 0 ease-in;
+    transition: none; 
+}
+
+#container {
+  height: 98vh;
+  width: 98vw;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+#charts_container {
+  order: 1;
+  height: 96vh;
+  width: calc(98vw - 800px);
+  overflow: scroll;
+}
+
+#network_container {
+  order: 1;
+  height: 96vh;
+  width: 96vw;
+  overflow: hidden;
+}
+
+</style>
+
+<link href="c3.css" rel="stylesheet" type="text/css">
+<script src="c3.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<!-- <script type="text/javascript" src="dbs.json"></script> -->
+
+</head>
+<body>
+<div id="container">
+<!-- <div id="charts_container">
+<div id="chart_plans"></div>
+<div id="chart_frames"></div>
+<div id="chart_structures"></div>
+<div id="chart_contents"></div>
+<div id="chart_contents_relative"></div>
+</div> -->
+<div id="network_container">
+  <div id="slider_container">
+    <select name=select1 id="select1" onchange='window.graph = window.graphs[d3.select("#select1").node().value]; window.graph_name = d3.select("#select1").node().value; draw_network()'>
+    <option></option>
+    </select>
+  </div>
+</div>
+</div>
+
+<script>
+
+d3.json("dbs.json", function(error,graph){
+window.graphs = graph;
+  for(graph_name in graphs){
+    d3.select("#select1").append("option").html(graph_name)
+  }
+
+  window.graph = window.graphs[d3.select("#select1").node().value];
+  console.log(window.graphs);
+})
+
+window.current_cycle = 1;
+window.activation_multiplier = 10;
+window.freeze = true;
+
+unfreeze = function(){
+  window.freeze = false;
+  setTimeout(function() {
+    window.freeze = true;
+  },5000);
+};
+
+
+var width = 800,
+    height = 1200;
+
+var color = d3.scale.category20();
+
+
+
+
+window.svg = d3.select("#network_container").append("svg")
+.attr("width", width)
+.attr("height", height);
+
+
+draw_network = function() {
+  window.svg.remove()
+    setTimeout( function(){
+    window.svg = d3.select("#network_container").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+  window.force = d3.layout.force()
+    .charge(-1000)
+    .linkDistance(80)
+    .alpha(0.99)
+    .size([width, height]);
+  unfreeze()
+  window.how_many_cycles = window.graph.nodes[0].activation.length
+  console.log(window.how_many_cycles)
+
+  window.force
+      .nodes(window.graph.nodes)
+      .links(window.graph.links)
+      .start();
+
+  var link = window.svg.selectAll(".link")
+      .data(window.graph.links)
+    .enter().append("line")
+      .attr("class", "link")
+      .style("stroke-width", function(d) { return 5 * d.weighting[0]; });
+
+  var nodes = window.svg.selectAll(".node")
+      .data(window.graph.nodes).enter()
+      .append("g")
+      .attr("transform", function(d){return "translate("+d.x+","+d.y+")"})
+      .call(window.force.drag);
+
+  var circle = nodes.append("circle")
+      .attr("class", "node")
+      .attr("r", function(d) { return Math.min(window.activation_multiplier * d.activation[0],35); })
+      .attr("alpha", 0.4)
+      .style("fill", function(d) { return color(d.kind); });
+
+  var text = nodes.append("text")
+      .attr("dx", function(d){return  -(d.id.length * (31/8))})
+      .text(function(d) { return d.id; });
+  var labels = nodes.append("title")
+       .text(function(d) { return d.activation[0]; });
+
+  window.force.on("tick", function() {
+    if(window.freeze==false) {
+      link.attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });  
+      nodes.attr("transform", function(d){return "translate("+d.x+","+d.y+")"});
+    }
+    circle.attr("r", function(d) { return Math.min(window.activation_multiplier * d.activation[window.current_cycle],35); });
+    labels.text(function(d) { return d.activation[window.current_cycle]; });
+  });
+},200);
+};
+
+// setTimeout(draw_network(), 500);
+
+// force.nodes()[0].activation.length
+
+</script>
+
+<script type="text/javascript">
+
+d3.json("dbs.json", function(data) {
+  console.log(data.nodes);
+});
+
+function filtered_chart_data(kinds, graph){
+    var result = [];
+    for(kind in kinds){
+      // console.log(kinds[kind])
+      for(node in graph){
+        // console.log(window.nodedata[node]);
+       if(graph[node].kind == kinds[kind]){
+        activations = [graph[node].id]
+        graph[node].activation.forEach(function(x){activations.push(x)})
+        result.push(activations);
+      };
+    };
+  };
+  return result;
+}
+
+function filtered_chart_data_relative(kinds, graph){
+    var result = [];
+    for(kind in kinds){
+      // console.log(kinds[kind])
+      for(node in graph){
+        // console.log(window.nodedata[node]);
+       if(graph[node].kind == kinds[kind]){
+        activations = [graph[node].id]
+        graph[node].relative_activation.forEach(function(x){activations.push(x)})
+        result.push(activations);
+      };
+    };
+  };
+  return result;
+}
+
+draw_charts = function() {
+  window.frames_data = filtered_chart_data(["frame_slot_node","frame_node"],window.graph.nodes);
+
+  window.chart_plans = c3.generate({
+    bindto: '#chart_plans',
+    size: {height: 180,
+           width: 5 * filtered_chart_data(["plan_node"],window.graph.nodes)[0].length,
+    },
+    // data: {
+    //   columns: [
+    //     ['data1', 30, 200, 100, 400, 150, 250],
+    //     ['data2', 50, 20, 10, 40, 15, 25]
+    //   ]
+    // }
+    data: {columns: filtered_chart_data(["plan_node"],window.graph.nodes),
+          onclick: function (d, element) {console.log(d.x);
+            window.current_cycle= d.x;
+            window.force.start();
+            // window.brush.extent([window.current_cycle, window.current_cycle])
+            // window.brush(d3.select(".brush").transition());
+            // window.brush.event(d3.select(".brush").transition().delay(1000));
+          },
+        transition:  {duration: 0}}
+  });
+
+  window.chart_frames = c3.generate({
+    bindto: '#chart_frames',
+    size: {height: 180,
+           width: 5 * filtered_chart_data(["plan_node"],window.graph.nodes)[0].length,},
+    // data: {
+    //   columns: [
+    //     ['data1', 30, 200, 100, 400, 150, 250],
+    //     ['data2', 50, 20, 10, 40, 15, 25]
+    //   ]
+    // }
+    data: {columns: window.frames_data, //,"structural_node"]),
+          onclick: function (d, element) {console.log(d.x);
+            window.current_cycle= d.x;
+            window.force.start();
+            // window.brush.extent([window.current_cycle, window.current_cycle])
+            // window.brush(d3.select(".brush").transition());
+            // window.brush.event(d3.select(".brush").transition().delay(1000));
+          },
+        transition:  {duration: 0}}
+  });
+
+  window.chart_structures = c3.generate({
+    bindto: '#chart_structures',
+    size: {height: 180,
+           width: 5 * filtered_chart_data(["plan_node"],window.graph.nodes)[0].length,},
+    // data: {
+    //   columns: [
+    //     ['data1', 30, 200, 100, 400, 150, 250],
+    //     ['data2', 50, 20, 10, 40, 15, 25]
+    //   ]
+    // }
+    data: {columns: filtered_chart_data(["structural_node"],window.graph.nodes),
+          onclick: function (d, element) {console.log(d.x);
+            window.current_cycle= d.x;
+            window.force.start();
+            // window.brush.extent([window.current_cycle, window.current_cycle])
+            // window.brush(d3.select(".brush").transition());
+            // window.brush.event(d3.select(".brush").transition().delay(1000));
+          },
+          transition:  {duration: 0}}
+  });
+
+
+  window.chart_contents = c3.generate({
+    bindto: '#chart_contents',
+    size: {height: 280,
+           width: 5 * filtered_chart_data(["plan_node"],window.graph.nodes)[0].length,},
+    regions: [{axis: 'x', start: window.current_cycle - 0.25, end: window.current_cycle + 0.25}],
+    data: {
+           columns: filtered_chart_data(["content_node"],window.graph.nodes), 
+           onclick: function (d, element) {console.log(d.x);
+              window.current_cycle= d.x;
+              window.force.start();
+           },
+           },
+           transition:  {duration: 0},
+  });
+    window.chart_contents_relative = c3.generate({
+    bindto: '#chart_contents_relative',
+    size: {height: 280,
+           width: 5 * filtered_chart_data(["plan_node"],window.graph.nodes)[0].length,},
+    regions: [{axis: 'y', start: 0.5, end: 1}],
+    data: {
+           columns: filtered_chart_data_relative(["content_node"],window.graph.nodes), 
+           onclick: function (d, element) {console.log(d.x);
+              window.current_cycle= d.x;
+              window.force.start();
+           },
+           },
+           transition:  {duration: 0},
+  });
+}
+
+// setTimeout(draw_charts, 600); 
+
+var shiftDown = false;
+var setShiftDown = function(event){
+    console.log("shiftDown");
+    if(event.keyCode === 16 || event.charCode === 16){
+        window.shiftDown = true;
+        window.freeze = false;
+    }
+    if(event.keyCode === 190){
+        window.current_cycle += 1;
+        window.force.start();
+
+    }
+    if(event.keyCode === 188){
+        window.current_cycle -= 1;
+        window.force.start()
+    }
+};
+
+var setShiftUp = function(event){
+    if(event.keyCode === 16 || event.charCode === 16){
+        window.shiftDown = false;
+        window.freeze = true;
+    }
+};
+
+window.addEventListener? document.addEventListener('keydown', setShiftDown) : document.attachEvent('keydown', setShiftDown);
+window.addEventListener? document.addEventListener('keyup', setShiftUp) : document.attachEvent('keyup', setShiftUp);
+
+
+function refresh_region() {
+  // chart_contents.flush()
+  // if(window.current_cycle != window.previous_cycle){
+  //   console.log(window.current_cycle);
+  //   console.log(window.chart_plans.regions())
+  //   if(window.chart_plans.regions() != [{axis: 'x', start: window.current_cycle-0.25, end: window.current_cycle+0.25, class: 'regionX'}]){
+  //     // window.chart_plans.regions.remove();
+  //     window.chart_plans.regions.add([{axis: 'x', start: window.current_cycle-0.25, end: window.current_cycle+0.25, class: 'regionX'}]);
+  //   }
+    
+  //   // window.chart_frames.regions.remove([{axis: 'x', start: window.previous_cycle-0.25, end: window.previous_cycle+0.25, class: 'regionX'}]);
+  //   // window.chart_structures.regions.remove([{axis: 'x', start: window.previous_cycle-0.25, end: window.previous_cycle+0.25, class: 'regionX'}]);
+  //   // window.chart_contents.regions.remove([{axis: 'x', start: window.previous_cycle-0.25, end: window.previous_cycle+0.25, class: 'regionX'}]);
+  //   // setTimeout(function() {
+  //     window.chart_plans.regions.add([{axis: 'x', start: window.current_cycle-0.25, end: window.current_cycle+0.25, class: 'regionX'}]);
+  //     // window.chart_frames.regions.add([{axis: 'x', start: window.current_cycle-0.25, end: window.current_cycle+0.25, class: 'regionX'}]);
+  //     // window.chart_structures.regions.add([{axis: 'x', start: window.current_cycle-0.25, end: window.current_cycle+0.25, class: 'regionX'}]);
+  //     // window.chart_contents.regions.add([{axis: 'x', start: window.current_cycle-0.25, end: window.current_cycle+0.25, class: 'regionX'}]);
+  //   // }, 100)
+  // }
+    setTimeout(function() {window.previous_cycle = window.current_cycle;},200);
+    setTimeout(refresh_region, 400);
+}
+
+setTimeout(refresh_region, 400);
+
+
+</script>
+
+</body>
+</html>

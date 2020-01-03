@@ -1,0 +1,58 @@
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<head>
+    <title>Cheatsheet - error counting task</title>
+<link href='https://fonts.googleapis.com/css?family=Cabin+Sketch:400' rel='stylesheet' type='text/css'>
+<style type="text/css">
+	body{
+    padding: 10px;
+    margin: 10px;
+    font-family: 'Cabin Sketch', cursive;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#messagetitle{
+  text-align:center;
+  color: red;
+  font-size: 4vw;
+}
+table{
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<div id = "messagetitle">Orthographic transcription</div>
+<p>The idea is to transcribe chunks of speech orthographically.</p>
+<p>The chunks were made automatically by a silence detection algorithm. Sometimes they are short, sometimes they are long.</p>
+<p>You have to listen to the recording (tab) and write in the box what you hear, with normal Dutch spelling. </p>
+<p> if the chunk is long, then only the first part is selected. You can move the cursors with the mouse to the next part, or you can press the
+' key. This moves the left cursor to the location of the right cursor, and the right cursor to 1.5 seconds after that.</p>
+<p>To save some key strokes, the system suggests words as you type. To accept the suggestion, press the . key.</p>
+<p>Please record disfluencies that actually resulted in sound orthographically, separated from neigbouring successful words by a space. </p>
+<p>Please record substituted or mispronounced words orthographically. Please use only lowercase letters, with no punctuation or numbers</p>
+<p> When you're done, you can click the green bar, or press the = key. </p>
+
+<p>If a short (single word) chunk is missing part of a word, you can press the flag button. Then, the chunk will be made longer, and can be retranscribed.</p>
+<p>If there is no speech, press the double thumbs down button. If there is some speech and a non-speech sound, transcribe the sound as best you can, so that
+the recogniser might identify it. For example, for a keyboard sound, you could type 'tsch'.</p>
+<p>If at the beginning or the end of the chunk, less than a whole syllable missing and you can clearly identify the word, transcribe it as of that word
+    was complete. In the retrimming, that will get fixed. Otherwise, transcribe just what you hear. The part words will get revisited revisited later.
+</p>
+
+<br><table><tr><th>button</th><th>keyboard shortcut</th><th>meaning</th></tr><tr>
+    <tr><td><img src="/static/images/proceed.png" width=50px></td><td>=</td><td>I'm done transcribing this chunk</td></tr>
+    <tr><td><img src="/static/images/flag.png" width=50px></td><td>]</td><td>The chunk is short and contains less than all of a single word</td></tr>
+    <tr><td><img src="/static/images/superbad.png" width=50px></td><td>[</td><td>The chunk contains no speech sound</td></tr>
+    <tr><td></td><td>'</td><td>move the cursors onwards</td></tr>
+    <tr><td></td><td>.</td><td>accept the system's suggested word completion</td></tr>
+
+    <tr><td>[click on waveform]</td><td>tab</td><td>Listen again</td></tr>
+
+</table><br>If you have questions, I can be found in room 363 or emailed, joe.rodd@mpi.nl
+</body>
+</html>

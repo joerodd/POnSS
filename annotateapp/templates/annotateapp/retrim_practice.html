@@ -1,0 +1,230 @@
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>retrim: POL-annotate</title>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+<script src="/static/jsPsych-4.1/jspsych.js"></script>
+<link href='https://fonts.googleapis.com/css?family=Cabin+Sketch:700,400' rel='stylesheet' type='text/css'>
+<script type="text/javascript">
+  var evaluator = {{ evaluator }}
+</script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+<style>
+body{
+    padding: 0px;
+    margin: 0px;
+    font-family: 'Cabin Sketch', cursive;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.button {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+.button>div {
+  display: table-cell;
+  text-align: center;
+  vertical-align: center;
+  height: 100%;
+  width: 100vw;
+}
+.middle {
+    display: table-cell;
+  width: 30vw;
+  max-width: 30vw;
+  min-width: 30vw;
+  vertical-align: middle;
+  text-align: center;
+}
+.subcontainer {
+  display: flex;
+    position: absolute;
+    margin: auto;
+    padding: 0px;
+    top: 25vh;
+    left: 30vw;
+    width: 40vw;
+    height: 25vw;
+    /*background-color: lightblue;*/
+    /*background-image: url("wafel.png");*/
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    color: red;
+    font-size: 10vw;
+    font-weight: bold;
+}
+
+#text_slot{
+  position: absolute;
+    margin: auto;
+    top: 10vh;
+    width: 40vw;
+    left: 30vw;
+    height: 10vw;
+    /*background-color: lightblue;*/
+    /*background-image: url("wafel.png");*/
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    text-align:center;
+    color: red;
+    font-size: 10vw;
+    font-weight: bold;
+}
+.left {
+    width: 31vw;
+    max-width: 220px;
+    background-image: url("/static/images/repaired.png");
+    background-repeat: no-repeat;
+    background-position: right top;
+    background-size: cover;
+    vertical-align: bottom;
+    color: white;
+    font-size: 30pt;
+    opacity: 0.6;
+}
+.right {
+    width: 39vw;
+    max-width: 220px;
+    background-image: url("/static/images/irrepairable.png");
+    background-repeat: no-repeat;
+    background-position: left top;
+    background-size: cover;
+    vertical-align: bottom;
+    color: white;
+    font-size: 30pt;
+    opacity: 0.6;
+}
+
+.floats {
+  opacity: 0.6;
+  position: absolute;
+  top: calc(100vh - 120px);
+  left: calc(50vw - 120px);
+  width: 240px;
+  height: 100px;
+}
+
+.floats>div{
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  margin-left: 8px;
+  margin-right: 8px;
+  background-size: cover;
+}
+
+
+#undo{
+  background-image: url("/static/images/undo.png");
+}
+
+#good_small{
+  background-image: url("/static/images/good_small.png");
+}
+#flag{
+  background-image: url("/static/images/flag.png");
+}
+
+#messagebox{
+  width: 80vw;
+  height: 70vh;
+  background-color: rgba(240, 240, 240, 0.85);
+  position:absolute;
+  top: -100vh;
+  left: 10vw;
+  z-index: 100;
+}
+
+#messagetitle{
+  text-align:center;
+  color: red;
+  font-size: 4vw;
+}
+
+table{
+  text-align: center;
+}
+
+#left_cursor {display: inline; position: relative; width: 12x; left: 48%; height: 100%; margin: 0px; padding: 0px; background-color: #333333; opacity: 0;}
+#right_cursor {display: inline; position: relative; width: 12px; left: 52%; height: 100%; margin: 0px padding: 0px; background-color: #333333; opacity: 0;}
+
+.cursor_inner {
+  height: 100%;
+  width: 3px;
+}
+
+#cursor_inner_left {
+  margin-left: 9px;
+  background-color: #FF0000;
+}
+#cursor_inner_right {
+  margin-right: 9px;
+  background-color: #0000FF;
+}
+
+/*.cursor{
+  position: absolute;
+  background-color: #FF0000;
+  top: calc(50vh - 120px);
+  left: calc(30vw + 40vw * 0.1);
+  width: 15px;
+  max-height: 512px;
+  min-height: 200px;
+}*/
+
+#messagetext{
+  padding: 2vw;
+}
+#messagebutton{
+  text-align:center;
+  color: red;
+  font-size: 4vw;
+  cursor: pointer;
+}
+</style>
+<script type="text/javascript">
+    $( function() {
+    $( "#left_cursor"  ).draggable({ containment: "parent", axis: "x"});
+    $( "#left_cursor"  ).mouseup(function(){
+      poll_cursors();
+      play();
+    });
+    $( "#right_cursor" ).draggable({ containment: "parent", axis: "x"});
+    $( "#right_cursor" ).mouseup(function(){
+      poll_cursors();
+      play();
+    });
+  } );
+</script>
+</head>
+<body>
+<div id = "messagebox">
+  <div id = "messagetitle"></div>
+  <div id = "messagetext"></div>
+</div>
+<div class="button" id="frame">
+  <div class="left" id="left"  onclick="repair_press()">W</div>
+  <div class="middle" id="middle" onclick="play_press()">
+    </div>
+  <div class = "right" id="right" onclick="superbad_press()">O</div>
+</div>
+<div class="subcontainer" id="subcontainer">
+  <div class="cursor draggable" id="left_cursor"><div class="cursor_inner" id="cursor_inner_left"></div></div>
+  <div class="cursor draggable" id="right_cursor"><div class="cursor_inner"  id="cursor_inner_right"></div></div>
+</div>
+<div id = "text_slot"></div>
+<div class = "floats" id = "floats">
+<!-- <div id="undo" onclick="undo_press()">Z</div> -->
+<div id="good_small" onclick="good_press()">G</div>
+<div id="flag" onclick="flag_press()">M</div>
+</div>
+<script src="/static/js/retrim_practice.js"></script>
+</body>
+</html>
